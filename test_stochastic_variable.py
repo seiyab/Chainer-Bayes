@@ -49,5 +49,3 @@ def test_log_prob():
     normal_sv = normal_dist()
     normal_sv.condition(cond_value)
     assert normal_sv.log_prob.data == chdist.Normal(mean, std).log_prob(cond_value).data
-
-test()
