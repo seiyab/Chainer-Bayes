@@ -4,6 +4,10 @@ from chainer import distributions as chdist
 from distribution import Normal
 from inference import MaximumLilekihoodEstimation
 
+def run():
+    test_maximum_likelihood_small_steps()
+    test_maximum_likelihood_fixed_point()
+
 def test_maximum_likelihood_small_steps():
     np.random.seed(0)
 
