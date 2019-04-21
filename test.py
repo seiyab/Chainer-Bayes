@@ -2,13 +2,15 @@ import numpy as np
 import chainer as ch
 from chainer import distributions as chdist
 from distribution import Normal
+import test_inference
 
 def test():
     test_sample()
     test_dependency()
     test_condition()
     test_log_prob()
-    test_maximum_likelihood()
+    test_inference.test_maximum_likelihood_small_steps()
+    test_inference.test_maximum_likelihood_fixed_point()
 
 
 def test_sample():
@@ -50,6 +52,5 @@ def test_log_prob():
     normal_sv = normal_dist()
     normal_sv.condition(cond_value)
     assert normal_sv.log_prob.data == chdist.Normal(mean, std).log_prob(cond_value).data
-
 
 test()
