@@ -1,18 +1,21 @@
 import numpy as np
 import chainer as ch
 from chainer import distributions as chdist
-from distribution import Normal
+from distribution import Normal, Distribution
 
 def run():
     test_sample()
     test_dependency()
     test_condition()
     test_log_prob()
-
+    test_sample_bernoulli()
 
 def test_sample():
     normal_dist = Normal(ch.Variable(np.zeros(10)), ch.Variable(np.ones(10)))
     normal_sv = normal_dist()
+
+    assert not normal_sv.is_determined
+
     sample = normal_sv.sample()
 
     assert normal_sv.is_sampled
@@ -22,6 +25,18 @@ def test_sample():
     assert all(normal_sv.sample().data == normal_sv.sample().data)
     assert any(normal_dist().sample().data != normal_dist().sample().data)
 
+def test_sample_bernoulli():
+    bernoulli_dist = Distribution(ch.distributions.Bernoulli, ch.Variable(np.ones(5) * 0.5))
+    bernoulli_sv = bernoulli_dist()
+
+    assert not bernoulli_sv.is_determined
+
+    sample = bernoulli_sv.sample()
+
+    assert bernoulli_sv.is_determined
+    assert isinstance(sample, ch.Variable)
+    assert sample.shape == (5,)
+    assert all(bernoulli_sv.sample().data == bernoulli_sv.sample().data)
 
 def test_dependency():
     normal_dist = Normal(ch.Variable(np.zeros(10)), ch.Variable(np.ones(10)))
