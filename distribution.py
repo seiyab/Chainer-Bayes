@@ -1,7 +1,7 @@
 import chainer as ch
 from chainer import distributions as dist
 
-from stochastic_variable import StochasticVariable, NormalStochasticVariable
+from stochastic_variable import StochasticVariable
 
 class Distribution:
     def __init__(self, distribution_class, *params):
