@@ -2,9 +2,11 @@ import numpy as np
 import chainer as ch
 from chainer import distributions as chdist
 from distribution import Normal, Distribution
+from stochastic_variable import StochasticVariable
 
 def run():
     test_sample()
+    test_sample_size()
     test_dependency()
     test_condition()
     test_log_prob()
@@ -24,6 +26,14 @@ def test_sample():
     assert sample.shape == (10,)
     assert all(normal_sv.sample().data == normal_sv.sample().data)
     assert any(normal_dist().sample().data != normal_dist().sample().data)
+
+def test_sample_size():
+    a = ch.Variable(np.ones(3))
+    b = ch.Variable(np.ones(3))
+    beta = StochasticVariable(chdist.Beta, a, b, sample_shape=(5, 4))
+
+    x = beta.sample()
+    assert x.shape == (5, 4, 3)
 
 def test_sample_bernoulli():
     bernoulli_dist = Distribution(ch.distributions.Bernoulli, ch.Variable(np.ones(5) * 0.5))

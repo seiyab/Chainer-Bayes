@@ -3,9 +3,10 @@ import chainer as ch
 from chainer import distributions as dist
 
 class StochasticVariable(object):
-    def __init__(self, distribution_class, *params):
+    def __init__(self, distribution_class, *params, **kwparams):
         self._distribution_class = distribution_class
         self._params = params
+        self._sample_shape = kwparams['sample_shape'] if 'sample_shape' in kwparams else ()
 
         self._is_sampled = False
         self._is_conditioned = False
@@ -19,7 +20,7 @@ class StochasticVariable(object):
                 for param in self._params
             ]
             distribution = self._distribution_class(*realized_params)
-            self._value = distribution.sample()
+            self._value = distribution.sample(sample_shape=self._sample_shape)
             self._is_sampled = True
         return self._value
 
