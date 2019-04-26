@@ -1,7 +1,6 @@
 import numpy as np
 import chainer as ch
-from chainer import distributions as chdist
-from distribution import Normal, Distribution
+from chainer import distributions as dist
 from stochastic_variable import StochasticVariable
 
 def run():
@@ -13,64 +12,67 @@ def run():
     test_sample_bernoulli()
 
 def test_sample():
-    normal_dist = Normal(ch.Variable(np.zeros(10)), ch.Variable(np.ones(10)))
-    normal_sv = normal_dist()
+    mu = ch.Variable(np.zeros(10))
+    sigma = ch.Variable(np.ones(10))
+    x = StochasticVariable(dist.Normal, mu, sigma)
 
-    assert not normal_sv.is_determined
+    assert not x.is_determined
 
-    sample = normal_sv.sample()
+    sample = x.sample()
 
-    assert normal_sv.is_sampled
-    assert normal_sv.is_determined
+    assert x.is_sampled
+    assert x.is_determined
     assert isinstance(sample, ch.Variable)
     assert sample.shape == (10,)
-    assert all(normal_sv.sample().data == normal_sv.sample().data)
-    assert any(normal_dist().sample().data != normal_dist().sample().data)
+    assert all(x.sample().data == x.sample().data)
 
 def test_sample_size():
     a = ch.Variable(np.ones(3))
     b = ch.Variable(np.ones(3))
-    beta = StochasticVariable(chdist.Beta, a, b, sample_shape=(5, 4))
+    beta = StochasticVariable(dist.Beta, a, b, sample_shape=(5, 4))
 
     x = beta.sample()
     assert x.shape == (5, 4, 3)
 
 def test_sample_bernoulli():
-    bernoulli_dist = Distribution(ch.distributions.Bernoulli, ch.Variable(np.ones(5) * 0.5))
-    bernoulli_sv = bernoulli_dist()
+    p = StochasticVariable(dist.Bernoulli, ch.Variable(np.ones(5) * 0.5))
 
-    assert not bernoulli_sv.is_determined
+    assert not p.is_determined
 
-    sample = bernoulli_sv.sample()
+    sample = p.sample()
 
-    assert bernoulli_sv.is_determined
+    assert p.is_determined
     assert isinstance(sample, ch.Variable)
     assert sample.shape == (5,)
-    assert all(bernoulli_sv.sample().data == bernoulli_sv.sample().data)
+    assert all(p.sample().data == p.sample().data)
 
 def test_dependency():
-    normal_dist = Normal(ch.Variable(np.zeros(10)), ch.Variable(np.ones(10)))
-    normal_sv = normal_dist()
-    sv_depends_on_sv = Normal(normal_sv, ch.Variable(np.ones(10)))()
-    assert normal_sv in sv_depends_on_sv.dependencies
-    sample = sv_depends_on_sv.sample()
-    assert normal_sv.is_sampled
+    x_mu = ch.Variable(np.zeros(10))
+    x_sigma = ch.Variable(np.ones(10))
+    x = StochasticVariable(dist.Normal, x_mu, x_sigma)
+
+    y_sigma = ch.Variable(np.ones(10))
+    y = StochasticVariable(dist.Normal, x, y_sigma)
+    assert x in y.dependencies
+    sample = y.sample()
+    assert x.is_sampled
+    assert y.is_sampled
 
 def test_condition():
-    normal_dist = Normal(ch.Variable(np.zeros(10)), ch.Variable(np.ones(10)))
-    normal_sv = normal_dist()
-    assert not normal_sv.is_determined
-    sample = normal_sv.condition(ch.Variable(np.ones(10)))
+    mu = ch.Variable(np.zeros(10))
+    sigma = ch.Variable(np.ones(10))
+    x = StochasticVariable(dist.Normal, mu, sigma)
+    assert not x.is_determined
+    sample = x.condition(ch.Variable(np.ones(10)))
     assert all(sample.data == np.ones(10))
-    assert normal_sv.is_conditioned
-    assert normal_sv.is_determined
+    assert x.is_conditioned
+    assert x.is_determined
 
 def test_log_prob():
-    mean = ch.Variable(np.array(0.))
-    std = ch.Variable(np.array(1.))
+    mu = ch.Variable(np.array(0.))
+    sigma = ch.Variable(np.array(1.))
     cond_value = ch.Variable(np.array(0.5))
 
-    normal_dist = Normal(mean, std)
-    normal_sv = normal_dist()
-    normal_sv.condition(cond_value)
-    assert normal_sv.log_prob.data == chdist.Normal(mean, std).log_prob(cond_value).data
+    x = StochasticVariable(dist.Normal, mu, sigma)
+    x.condition(cond_value)
+    assert x.log_prob.data == dist.Normal(mu, sigma).log_prob(cond_value).data
