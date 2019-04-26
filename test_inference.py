@@ -1,7 +1,7 @@
 import numpy as np
 import chainer as ch
-from chainer import distributions as chdist
-from distribution import Normal, Distribution
+from chainer import distributions as dist
+from stochastic_variable import StochasticVariable
 from inference import MaximumLilekihoodEstimation
 
 def run():
@@ -17,7 +17,7 @@ def test_maximum_likelihood_small_steps():
     param_mu = ch.Parameter(np.array(param_mu_init))
     param_sigma = ch.Parameter(np.array(param_sigma_init))
 
-    model = lambda: {"x": Normal(param_mu, param_sigma)()}
+    model = lambda: {"x": StochasticVariable(dist.Normal, param_mu, param_sigma)}
     infer = MaximumLilekihoodEstimation(model, mu=param_mu, sigma=param_sigma)
     optimizer = ch.optimizers.SGD(lr=0.05).setup(infer)
 
@@ -39,7 +39,7 @@ def test_maximum_likelihood_fixed_point():
     param_mu = ch.Parameter(np.array(param_mu_init))
     param_sigma = ch.Parameter(np.array(param_sigma_init))
 
-    model = lambda: {"x": Normal(param_mu, param_sigma)()}
+    model = lambda: {"x": StochasticVariable(dist.Normal, param_mu, param_sigma)}
     infer = MaximumLilekihoodEstimation(model, mu=param_mu, sigma=param_sigma)
     optimizer = ch.optimizers.SGD(lr=0.05).setup(infer)
 
@@ -60,7 +60,7 @@ def test_maxlimum_likelihood_bernoulli():
     param_p_init = 0.3
     param_p = ch.Parameter(np.array(param_p_init))
 
-    model = lambda: {"b": Distribution(ch.distributions.Bernoulli, param_p)()}
+    model = lambda: {"b": StochasticVariable(dist.Bernoulli, param_p)}
     infer = MaximumLilekihoodEstimation(model, p=param_p)
     optimizer = ch.optimizers.SGD(lr=0.05).setup(infer)
 
