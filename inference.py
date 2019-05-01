@@ -16,4 +16,4 @@ class MaximumLilekihoodEstimation(ch.Link):
         for sv in process.values():
             if not sv.is_determined:
                 sv.sample()
-        return -sum(sv.log_prob for sv in process.values() if sv.is_conditioned)
+        return -sum(sv.log_prob_sum for sv in process.values() if sv.is_conditioned)
