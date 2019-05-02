@@ -28,6 +28,7 @@ class StochasticVariable(object):
             distribution = self._distribution_class(*realized_params, **realized_kwparams)
             self._value = distribution.sample(sample_shape=self._sample_shape)
             self._is_sampled = True
+            self._value.unchain()
         return self._value
 
     def condition(self, data):
