@@ -1,7 +1,7 @@
 import unittest
 
-from chainer_bayes.inference.stochastic_variational_inference import StochasticVariationalInference
-from chainer_bayes.stochastic_variable import StochasticVariable
+from chainer_bayes.inference import StochasticVariationalInference
+from chainer_bayes import StochasticVariable
 
 import numpy as np
 import chainer as ch

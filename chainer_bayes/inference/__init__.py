@@ -1,0 +1,2 @@
+from chainer_bayes.inference.maximum_likelihood_estimation import MaximumLikelihoodEstimation
+from chainer_bayes.inference.stochastic_variational_inference import StochasticVariationalInference

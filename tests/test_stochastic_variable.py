@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 import chainer as ch
 from chainer import distributions as dist
-from chainer_bayes.stochastic_variable import StochasticVariable
+from chainer_bayes import StochasticVariable
 
 class TestStochasticVariable(unittest.TestCase):
 
