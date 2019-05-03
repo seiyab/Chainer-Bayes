@@ -1,0 +1,1 @@
+from chainer_bayes.stochastic_variable import StochasticVariable
