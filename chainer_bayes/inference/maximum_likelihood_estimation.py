@@ -14,6 +14,5 @@ class MaximumLikelihoodEstimation(ch.Link):
         for name, data in condition.items():
             process[name].condition(data)
         for sv in process.values():
-            if not sv.is_determined:
-                sv.sample()
+            sv.sample()
         return -sum(sv.log_prob_sum for sv in process.values() if sv.is_conditioned)
